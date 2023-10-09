@@ -1,113 +1,116 @@
-import Image from 'next/image'
+"use client";
+import Image from "next/image";
+import { result, storeResult, searchAlpha } from "@/app/handleStockPrice";
+import { PureComponent, useState, useRef } from "react";
+import { day, portfolioEntry } from "./logic";
+import {
+	AreaChart,
+	Area,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip,
+	ResponsiveContainer,
+} from "recharts";
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+	const [portfolio, setPortfolio] = useState<portfolioEntry[]>([]);
+	const gen = useRef(day(new Date("2010-01-01"), new Date("2019-12-31"), 7));
+	const [intervalRef, setIntervalRef] = useState<number>();
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+	const startAuto = () => {
+		setIntervalRef(window.setInterval(handleClick, 10));
+	};
+	const stopAuto = () => {
+		if (intervalRef !== undefined) {
+			window.clearInterval(intervalRef);
+			setIntervalRef(undefined);
+			return;
+		}
+	};
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+	const handleAuto = () => {
+		if (intervalRef !== undefined) {
+			stopAuto();
+			return;
+		}
+		startAuto();
+	};
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+	const handleClick = async () => {
+		const result = gen.current.next();
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+		if (!result.done) {
+			setPortfolio((prev_portfolio) => {
+				return prev_portfolio.concat([result.value]);
+			});
+		}
+	};
+	return (
+		<main className="flex flex-col items-center justify-center h-screen w-screen">
+			<div>Portfolio Value</div>
+			<div className="flex gap-5">
+				<button
+					className="w-24 h-10 rounded-full bg-gradient-to-r from-indigo-700 via-pink-600 to-red-500 hover:scale-125 active:scale-90 duration-150"
+					onClick={() => {
+						handleClick();
+					}}
+				>
+					Next Day
+				</button>
+				<button
+					className="w-24 h-10 rounded-full bg-gradient-to-r from-indigo-700 via-pink-600 to-red-500 hover:scale-125 active:scale-90 duration-150"
+					onClick={handleAuto}
+				>
+					{intervalRef !== undefined ? "Stop" : "Auto"}
+				</button>
+			</div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+			<DrawChart data={portfolio} />
+		</main>
+	);
 }
+
+const DrawChart = ({ data }: { data: portfolioEntry[] }) => {
+	return (
+		<ResponsiveContainer width="80%" height="80%">
+			<AreaChart
+				width={500}
+				height={400}
+				data={data}
+				margin={{
+					top: 10,
+					right: 30,
+					left: 0,
+					bottom: 0,
+				}}
+			>
+				<defs>
+					<linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+						<stop
+							offset="5%"
+							stopColor="#82ca9d"
+							stopOpacity={0.8}
+						/>
+						<stop
+							offset="95%"
+							stopColor="#82ca9d"
+							stopOpacity={0}
+						/>
+					</linearGradient>
+				</defs>
+
+				<CartesianGrid strokeDasharray="3 3" />
+				<XAxis dataKey="date" />
+				<YAxis />
+				<Tooltip />
+				<Area
+					type="monotone"
+					dataKey="value"
+					stroke="#82ca9d"
+					fill="url(#colorUv)"
+				/>
+			</AreaChart>
+		</ResponsiveContainer>
+	);
+};
